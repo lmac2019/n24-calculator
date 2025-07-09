@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   TextField,
@@ -84,12 +84,29 @@ type ScheduleRow = {
 };
 
 export default function App() {
-  const [currentSleepStart, setCurrentSleepStart] = useState("10:00");
-  const [currentSleepEnd, setCurrentSleepEnd] = useState("18:00");
-  const [currentDate, setCurrentDate] = useState("2025-07-09");
-  const [startDate, setStartDate] = useState("2025-07-09");
-  const [endDate, setEndDate] = useState("2025-08-05");
+  const [currentSleepStart, setCurrentSleepStart] = useState(() => localStorage.getItem("currentSleepStart") || "10:00");
+  const [currentSleepEnd, setCurrentSleepEnd] = useState(() => localStorage.getItem("currentSleepEnd") || "18:00");
+  const [currentDate, setCurrentDate] = useState(() => localStorage.getItem("currentDate") || "2025-07-09");
+  const [startDate, setStartDate] = useState(() => localStorage.getItem("startDate") || "2025-07-09");
+  const [endDate, setEndDate] = useState(() => localStorage.getItem("endDate") || "2025-08-05");
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
+
+  // Save input values to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem("currentSleepStart", currentSleepStart);
+  }, [currentSleepStart]);
+  useEffect(() => {
+    localStorage.setItem("currentSleepEnd", currentSleepEnd);
+  }, [currentSleepEnd]);
+  useEffect(() => {
+    localStorage.setItem("currentDate", currentDate);
+  }, [currentDate]);
+  useEffect(() => {
+    localStorage.setItem("startDate", startDate);
+  }, [startDate]);
+  useEffect(() => {
+    localStorage.setItem("endDate", endDate);
+  }, [endDate]);
 
   const generateSchedule = (): ScheduleRow[] => {
     const start = parseISO(startDate);
