@@ -89,6 +89,7 @@ export default function App() {
   const [currentDate, setCurrentDate] = useState("2025-07-09");
   const [startDate, setStartDate] = useState("2025-07-09");
   const [endDate, setEndDate] = useState("2025-08-05");
+  const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
   const generateSchedule = (): ScheduleRow[] => {
     const start = parseISO(startDate);
@@ -169,37 +170,30 @@ export default function App() {
             type="time"
             value={currentSleepStart}
             onChange={(e) => setCurrentSleepStart(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            inputProps={{ step: 60 }}
           />
           <TextField
             label="Sleep End"
             type="time"
             value={currentSleepEnd}
             onChange={(e) => setCurrentSleepEnd(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            inputProps={{ step: 60 }}
           />
           <TextField
             label="Current Date"
             type="date"
             value={currentDate}
             onChange={(e) => setCurrentDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
           />
           <TextField
             label="Start Date"
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
           />
           <TextField
             label="End Date"
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
           />
         </Stack>
       </Container>
@@ -239,7 +233,13 @@ export default function App() {
                 wakeStartBJ,
                 wakeEndBJ,
               }) => (
-                <TableRow key={day}>
+                <TableRow
+                  key={day}
+                  hover
+                  selected={selectedRow === day}
+                  onClick={() => setSelectedRow(day)}
+                  sx={selectedRow === day ? { backgroundColor: 'rgba(25, 118, 210, 0.15)' } : { cursor: 'pointer' }}
+                >
                   <TableCell>{day}</TableCell>
                   <TableCell>{format(date, "yyyy-MM-dd")}</TableCell>
                   <TableCell>{`${sleepStart} - ${sleepEnd}`}</TableCell>
