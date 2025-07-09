@@ -36,6 +36,16 @@ function timeStringToDate(baseDate: Date, timeStr: string): Date {
   return setMinutes(setHours(baseDate, h), m);
 }
 
+function isNextDay(start: Date, end: Date, timeZone?: string) {
+  const getHour = (d: Date) => timeZone ? parseInt(formatTz(d, "H", { timeZone }), 10) : d.getHours();
+  const getMinute = (d: Date) => timeZone ? parseInt(formatTz(d, "m", { timeZone }), 10) : d.getMinutes();
+  const startHour = getHour(start);
+  const startMinute = getMinute(start);
+  const endHour = getHour(end);
+  const endMinute = getMinute(end);
+  return (endHour < startHour) || (endHour === startHour && endMinute <= startMinute);
+}
+
 function formatBeijingRange(
   localStart: Date,
   localEnd: Date
@@ -48,9 +58,7 @@ function formatBeijingRange(
   const startStr = formatTz(startInBJ, "h:mm a", { timeZone: BEIJING_TZ });
   const endStr = formatTz(endInBJ, "h:mm a", { timeZone: BEIJING_TZ });
 
-  const nextDay =
-    formatTz(startInBJ, "yyyy-MM-dd", { timeZone: BEIJING_TZ }) !==
-    formatTz(endInBJ, "yyyy-MM-dd", { timeZone: BEIJING_TZ });
+  const nextDay = isNextDay(startInBJ, endInBJ, BEIJING_TZ);
 
   return [startStr, `${endStr}${nextDay ? " (next day)" : ""}`];
 }
@@ -58,7 +66,7 @@ function formatBeijingRange(
 function formatLocalRange(start: Date, end: Date): [string, string] {
   const startStr = format(start, "h:mm a");
   const endStr = format(end, "h:mm a");
-  const nextDay = format(start, "yyyy-MM-dd") !== format(end, "yyyy-MM-dd");
+  const nextDay = isNextDay(start, end);
   return [startStr, `${endStr}${nextDay ? " (next day)" : ""}`];
 }
 
