@@ -27,7 +27,6 @@ import {
   format as formatTz,
 } from "date-fns-tz";
 
-const DAILY_SHIFT_MINUTES = 51.4;
 const LOCAL_TZ = "America/Vancouver";
 const BEIJING_TZ = "Asia/Shanghai";
 
@@ -84,12 +83,16 @@ type ScheduleRow = {
 };
 
 export default function App() {
-  const [currentSleepStart, setCurrentSleepStart] = useState(() => localStorage.getItem("currentSleepStart") || "10:00");
-  const [currentSleepEnd, setCurrentSleepEnd] = useState(() => localStorage.getItem("currentSleepEnd") || "18:00");
-  const [currentDate, setCurrentDate] = useState(() => localStorage.getItem("currentDate") || "2025-07-09");
-  const [startDate, setStartDate] = useState(() => localStorage.getItem("startDate") || "2025-07-09");
-  const [endDate, setEndDate] = useState(() => localStorage.getItem("endDate") || "2025-08-05");
+  const [currentSleepStart, setCurrentSleepStart] = useState(() => localStorage.getItem("currentSleepStart") || "21:54");
+  const [currentSleepEnd, setCurrentSleepEnd] = useState(() => localStorage.getItem("currentSleepEnd") || "06:22");
+  const [currentDate, setCurrentDate] = useState(() => localStorage.getItem("currentDate") || "2025-07-07");
+  const [startDate, setStartDate] = useState(() => localStorage.getItem("startDate") || "2025-10-20");
+  const [endDate, setEndDate] = useState(() => localStorage.getItem("endDate") || "2025-11-14");
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
+  const [dailyShiftMinutes, setDailyShiftMinutes] = useState(() => {
+    const stored = localStorage.getItem("dailyShiftMinutes");
+    return stored ? parseFloat(stored) : 51.43;
+  });
 
   // Save input values to localStorage when they change
   useEffect(() => {
@@ -107,6 +110,9 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("endDate", endDate);
   }, [endDate]);
+  useEffect(() => {
+    localStorage.setItem("dailyShiftMinutes", String(dailyShiftMinutes));
+  }, [dailyShiftMinutes]);
 
   const generateSchedule = (): ScheduleRow[] => {
     const start = parseISO(startDate);
@@ -121,7 +127,7 @@ export default function App() {
     for (let i = 0; i < totalDays; i++) {
       const dayNum = i + 1;
       const thisDate = addDays(start, i);
-      const shift = (offsetDays + i) * DAILY_SHIFT_MINUTES;
+      const shift = (offsetDays + i) * dailyShiftMinutes;
 
       const baseSleepStart = timeStringToDate(thisDate, currentSleepStart);
       const baseSleepEnd = timeStringToDate(thisDate, currentSleepEnd);
@@ -211,6 +217,13 @@ export default function App() {
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
+          />
+          <TextField
+            label="Daily Shift (min)"
+            type="number"
+            inputProps={{ step: 0.1, min: 0 }}
+            value={dailyShiftMinutes}
+            onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
           />
         </Stack>
       </Container>
