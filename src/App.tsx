@@ -11,6 +11,8 @@ import {
   Stack,
   Paper,
   Box,
+  ThemeProvider,
+  createTheme,
 } from "@mui/material";
 import {
   addDays,
@@ -29,6 +31,21 @@ import {
 
 const LOCAL_TZ = "America/Vancouver";
 const BEIJING_TZ = "Asia/Shanghai";
+
+// Create dark theme
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    text: {
+      primary: '#ffffff',
+      secondary: '#b3b3b3',
+    },
+  },
+});
 
 function timeStringToDate(baseDate: Date, timeStr: string): Date {
   const [h, m] = timeStr.split(":").map(Number);
@@ -188,135 +205,140 @@ export default function App() {
   };
 
   return (
-    <Box
-      sx={{
-        height: "100vh",
-        width: "100vw",
-        display: "flex",
-        flexDirection: "column",
-        fontFamily: "monospace",
-      }}
-    >
-      <Container maxWidth="lg" sx={{ mt: 4, flexShrink: 0 }}>
-        <Typography variant="h5" gutterBottom>
-          Sleep Cycle Schedule (Vancouver ➜ Beijing)
-        </Typography>
-        <Stack
-          direction="row"
-          spacing={2}
-          flexWrap="wrap"
-          sx={{ mb: 3, "& > *": { minWidth: 160 } }}
-        >
-          <TextField
-            label="Sleep Start"
-            type="time"
-            value={currentSleepStart}
-            onChange={(e) => setCurrentSleepStart(e.target.value)}
-          />
-          <TextField
-            label="Sleep End"
-            type="time"
-            value={currentSleepEnd}
-            onChange={(e) => setCurrentSleepEnd(e.target.value)}
-          />
-          <TextField
-            label="Current Date"
-            type="date"
-            value={currentDate}
-            onChange={(e) => setCurrentDate(e.target.value)}
-          />
-          <TextField
-            label="Start Date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <TextField
-            label="End Date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-          <TextField
-            label="Daily Shift (min)"
-            type="number"
-            inputProps={{ step: 0.1, min: 0 }}
-            value={dailyShiftMinutes}
-            onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
-          />
-        </Stack>
-      </Container>
-
+    <ThemeProvider theme={darkTheme}>
       <Box
-        component={Paper}
         sx={{
-          flexGrow: 1,
-          maxWidth: "100vw",
-          overflow: "auto",
-          px: 2,
-          pb: 2,
+          height: "100vh",
+          width: "100vw",
+          display: "flex",
+          flexDirection: "column",
+          fontFamily: "monospace",
+          backgroundColor: 'background.paper',
+          color: 'text.primary',
         }}
       >
-        <Table stickyHeader size="small" sx={{ minWidth: 1200 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Day</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Sleep</TableCell>
-              <TableCell>Wake</TableCell>
-              <TableCell>Sleep (Beijing)</TableCell>
-              <TableCell>Wake (Beijing)</TableCell>
-              <TableCell>Notes</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {schedule.map(
-              ({
-                day,
-                date,
-                sleepStart,
-                sleepEnd,
-                wakeStart,
-                wakeEnd,
-                sleepStartBJ,
-                sleepEndBJ,
-                wakeStartBJ,
-                wakeEndBJ,
-              }) => {
-                const noteKey = getNoteKey(day, date);
-                const note = notes[noteKey] || "";
-                
-                return (
-                  <TableRow
-                    key={day}
-                    hover
-                    selected={selectedRow === day}
-                    onClick={() => setSelectedRow(day)}
-                    sx={selectedRow === day ? { backgroundColor: 'rgba(25, 118, 210, 0.15)' } : { cursor: 'pointer' }}
-                  >
-                    <TableCell>{day}</TableCell>
-                    <TableCell>{format(date, "yyyy-MM-dd")}</TableCell>
-                    <TableCell>{`${sleepStart} - ${sleepEnd}`}</TableCell>
-                    <TableCell>{`${wakeStart} - ${wakeEnd}`}</TableCell>
-                    <TableCell>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
-                    <TableCell>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
-                    <TableCell>
-                      <TextField
-                        size="small"
-                        placeholder="Add note..."
-                        value={note}
-                        onChange={(e) => handleNoteChange(day, date, e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                        sx={{ minWidth: 200 }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              }
-            )}
-          </TableBody>
-        </Table>
+              <Container maxWidth="lg" sx={{ mt: 4, flexShrink: 0 }}>
+          <Typography variant="h5" gutterBottom>
+            Sleep Cycle Schedule (Vancouver ➜ Beijing)
+          </Typography>
+          <Stack
+            direction="row"
+            spacing={2}
+            flexWrap="wrap"
+            sx={{ mb: 3, "& > *": { minWidth: 160 } }}
+          >
+            <TextField
+              label="Sleep Start"
+              type="time"
+              value={currentSleepStart}
+              onChange={(e) => setCurrentSleepStart(e.target.value)}
+            />
+            <TextField
+              label="Sleep End"
+              type="time"
+              value={currentSleepEnd}
+              onChange={(e) => setCurrentSleepEnd(e.target.value)}
+            />
+            <TextField
+              label="Current Date"
+              type="date"
+              value={currentDate}
+              onChange={(e) => setCurrentDate(e.target.value)}
+            />
+            <TextField
+              label="Start Date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+            <TextField
+              label="End Date"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+            <TextField
+              label="Daily Shift (min)"
+              type="number"
+              inputProps={{ step: 0.1, min: 0 }}
+              value={dailyShiftMinutes}
+              onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
+            />
+          </Stack>
+        </Container>
+
+        <Box
+          component={Paper}
+          sx={{
+            flexGrow: 1,
+            maxWidth: "100vw",
+            overflow: "auto",
+            px: 2,
+            pb: 2,
+            backgroundColor: 'background.paper',
+          }}
+        >
+          <Table stickyHeader size="small" sx={{ minWidth: 1200 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ backgroundColor: '#232323' }}>Day</TableCell>
+                <TableCell sx={{ backgroundColor: '#232323' }}>Date</TableCell>
+                <TableCell sx={{ backgroundColor: '#232323' }}>Sleep</TableCell>
+                <TableCell sx={{ backgroundColor: '#232323' }}>Wake</TableCell>
+                <TableCell sx={{ backgroundColor: '#232323' }}>Sleep (Beijing)</TableCell>
+                <TableCell sx={{ backgroundColor: '#232323' }}>Wake (Beijing)</TableCell>
+                <TableCell sx={{ backgroundColor: '#232323' }}>Notes</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {schedule.map(
+                ({
+                  day,
+                  date,
+                  sleepStart,
+                  sleepEnd,
+                  wakeStart,
+                  wakeEnd,
+                  sleepStartBJ,
+                  sleepEndBJ,
+                  wakeStartBJ,
+                  wakeEndBJ,
+                }) => {
+                  const noteKey = getNoteKey(day, date);
+                  const note = notes[noteKey] || "";
+                  
+                  return (
+                    <TableRow
+                      key={day}
+                      hover
+                      selected={selectedRow === day}
+                      onClick={() => setSelectedRow(day)}
+                      sx={selectedRow === day ? { backgroundColor: 'rgba(25, 118, 210, 0.15)' } : { cursor: 'pointer' }}
+                    >
+                      <TableCell sx={{ backgroundColor: '#232323' }}>{day}</TableCell>
+                      <TableCell sx={{ backgroundColor: '#232323' }}>{format(date, "yyyy-MM-dd")}</TableCell>
+                      <TableCell sx={{ backgroundColor: '#232323' }}>{`${sleepStart} - ${sleepEnd}`}</TableCell>
+                      <TableCell sx={{ backgroundColor: '#232323' }}>{`${wakeStart} - ${wakeEnd}`}</TableCell>
+                      <TableCell sx={{ backgroundColor: '#232323' }}>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
+                      <TableCell sx={{ backgroundColor: '#232323' }}>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
+                      <TableCell sx={{ backgroundColor: '#232323' }}>
+                        <TextField
+                          size="small"
+                          placeholder="Add note..."
+                          value={note}
+                          onChange={(e) => handleNoteChange(day, date, e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          sx={{ minWidth: 200 }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                }
+              )}
+            </TableBody>
+          </Table>
+        </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 }
