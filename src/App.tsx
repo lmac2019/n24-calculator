@@ -278,30 +278,35 @@ export default function App() {
                 type="time"
                 value={currentSleepStart}
                 onChange={(e) => setCurrentSleepStart(e.target.value)}
+                sx={{ minWidth: 150 }}
               />
               <TextField
                 label="Sleep End"
                 type="time"
                 value={currentSleepEnd}
                 onChange={(e) => setCurrentSleepEnd(e.target.value)}
+                sx={{ minWidth: 150 }}
               />
               <TextField
                 label="Current Date"
                 type="date"
                 value={currentDate}
                 onChange={(e) => setCurrentDate(e.target.value)}
+                sx={{ minWidth: 150 }}
               />
               <TextField
                 label="Start Date"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
+                sx={{ minWidth: 150 }}
               />
               <TextField
                 label="End Date"
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                sx={{ minWidth: 150 }}
               />
               <TextField
                 label="Daily Shift (min)"
@@ -309,9 +314,10 @@ export default function App() {
                 inputProps={{ step: 0.1, min: 0 }}
                 value={dailyShiftMinutes}
                 onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
+                sx={{ minWidth: 150 }}
               />
             </Box>
-            <Box sx={{ minWidth: 180 }}>
+            <Box sx={{ minWidth: 350 }}>
               <ButtonGroup variant="outlined" size="large" sx={{ width: '100%' }}>
                 <Button onClick={shiftNotesUp} sx={{ flex: 1 }}>
                   SHIFT NOTES ↑
