@@ -312,7 +312,7 @@ export default function App() {
                       key={day}
                       hover
                       selected={selectedRow === day}
-                      onClick={() => setSelectedRow(day)}
+                      onClick={() => setSelectedRow(selectedRow === day ? null : day)}
                       sx={selectedRow === day ? { backgroundColor: 'rgba(25, 118, 210, 0.15)' } : { cursor: 'pointer' }}
                     >
                       <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{day}</TableCell>
