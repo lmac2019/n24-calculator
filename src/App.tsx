@@ -93,6 +93,10 @@ export default function App() {
     const stored = localStorage.getItem("dailyShiftMinutes");
     return stored ? parseFloat(stored) : 51.43;
   });
+  const [notes, setNotes] = useState<Record<string, string>>(() => {
+    const stored = localStorage.getItem("scheduleNotes");
+    return stored ? JSON.parse(stored) : {};
+  });
 
   // Save input values to localStorage when they change
   useEffect(() => {
@@ -113,6 +117,9 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("dailyShiftMinutes", String(dailyShiftMinutes));
   }, [dailyShiftMinutes]);
+  useEffect(() => {
+    localStorage.setItem("scheduleNotes", JSON.stringify(notes));
+  }, [notes]);
 
   const generateSchedule = (): ScheduleRow[] => {
     const start = parseISO(startDate);
@@ -167,6 +174,18 @@ export default function App() {
   };
 
   const schedule = generateSchedule();
+
+  const getNoteKey = (day: number, date: Date): string => {
+    return format(date, "yyyy-MM-dd");
+  };
+
+  const handleNoteChange = (day: number, date: Date, value: string) => {
+    const key = getNoteKey(day, date);
+    setNotes(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
 
   return (
     <Box
@@ -238,7 +257,7 @@ export default function App() {
           pb: 2,
         }}
       >
-        <Table stickyHeader size="small" sx={{ minWidth: 1000 }}>
+        <Table stickyHeader size="small" sx={{ minWidth: 1200 }}>
           <TableHead>
             <TableRow>
               <TableCell>Day</TableCell>
@@ -247,6 +266,7 @@ export default function App() {
               <TableCell>Wake</TableCell>
               <TableCell>Sleep (Beijing)</TableCell>
               <TableCell>Wake (Beijing)</TableCell>
+              <TableCell>Notes</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -262,22 +282,37 @@ export default function App() {
                 sleepEndBJ,
                 wakeStartBJ,
                 wakeEndBJ,
-              }) => (
-                <TableRow
-                  key={day}
-                  hover
-                  selected={selectedRow === day}
-                  onClick={() => setSelectedRow(day)}
-                  sx={selectedRow === day ? { backgroundColor: 'rgba(25, 118, 210, 0.15)' } : { cursor: 'pointer' }}
-                >
-                  <TableCell>{day}</TableCell>
-                  <TableCell>{format(date, "yyyy-MM-dd")}</TableCell>
-                  <TableCell>{`${sleepStart} - ${sleepEnd}`}</TableCell>
-                  <TableCell>{`${wakeStart} - ${wakeEnd}`}</TableCell>
-                  <TableCell>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
-                  <TableCell>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
-                </TableRow>
-              )
+              }) => {
+                const noteKey = getNoteKey(day, date);
+                const note = notes[noteKey] || "";
+                
+                return (
+                  <TableRow
+                    key={day}
+                    hover
+                    selected={selectedRow === day}
+                    onClick={() => setSelectedRow(day)}
+                    sx={selectedRow === day ? { backgroundColor: 'rgba(25, 118, 210, 0.15)' } : { cursor: 'pointer' }}
+                  >
+                    <TableCell>{day}</TableCell>
+                    <TableCell>{format(date, "yyyy-MM-dd")}</TableCell>
+                    <TableCell>{`${sleepStart} - ${sleepEnd}`}</TableCell>
+                    <TableCell>{`${wakeStart} - ${wakeEnd}`}</TableCell>
+                    <TableCell>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
+                    <TableCell>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
+                    <TableCell>
+                      <TextField
+                        size="small"
+                        placeholder="Add note..."
+                        value={note}
+                        onChange={(e) => handleNoteChange(day, date, e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{ minWidth: 200 }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              }
             )}
           </TableBody>
         </Table>
