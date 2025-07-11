@@ -13,6 +13,8 @@ import {
   Box,
   ThemeProvider,
   createTheme,
+  Button,
+  ButtonGroup,
 } from "@mui/material";
 import {
   addDays,
@@ -204,6 +206,48 @@ export default function App() {
     }));
   };
 
+  const shiftNotesUp = () => {
+    setNotes(prev => {
+      const newNotes: Record<string, string> = {};
+      
+      // Get all the dates from the schedule
+      const scheduleDates = schedule.map(row => format(row.date, "yyyy-MM-dd"));
+      
+      // For each date in the schedule, move the note from the next day
+      for (let i = 0; i < scheduleDates.length - 1; i++) {
+        const currentDate = scheduleDates[i];
+        const nextDate = scheduleDates[i + 1];
+        
+        if (prev[nextDate]) {
+          newNotes[currentDate] = prev[nextDate];
+        }
+      }
+      
+      return newNotes;
+    });
+  };
+
+  const shiftNotesDown = () => {
+    setNotes(prev => {
+      const newNotes: Record<string, string> = {};
+      
+      // Get all the dates from the schedule
+      const scheduleDates = schedule.map(row => format(row.date, "yyyy-MM-dd"));
+      
+      // For each date in the schedule, move the note from the previous day
+      for (let i = 1; i < scheduleDates.length; i++) {
+        const currentDate = scheduleDates[i];
+        const prevDate = scheduleDates[i - 1];
+        
+        if (prev[prevDate]) {
+          newNotes[currentDate] = prev[prevDate];
+        }
+      }
+      
+      return newNotes;
+    });
+  };
+
   return (
     <ThemeProvider theme={darkTheme}>
       <Box
@@ -224,46 +268,59 @@ export default function App() {
           <Stack
             direction="row"
             spacing={2}
-            flexWrap="wrap"
-            sx={{ mb: 3, "& > *": { minWidth: 160 } }}
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ mb: 3 }}
           >
-            <TextField
-              label="Sleep Start"
-              type="time"
-              value={currentSleepStart}
-              onChange={(e) => setCurrentSleepStart(e.target.value)}
-            />
-            <TextField
-              label="Sleep End"
-              type="time"
-              value={currentSleepEnd}
-              onChange={(e) => setCurrentSleepEnd(e.target.value)}
-            />
-            <TextField
-              label="Current Date"
-              type="date"
-              value={currentDate}
-              onChange={(e) => setCurrentDate(e.target.value)}
-            />
-            <TextField
-              label="Start Date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <TextField
-              label="End Date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-            <TextField
-              label="Daily Shift (min)"
-              type="number"
-              inputProps={{ step: 0.1, min: 0 }}
-              value={dailyShiftMinutes}
-              onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
-            />
+            <Box sx={{ display: 'flex', gap: 2, flex: 1 }}>
+              <TextField
+                label="Sleep Start"
+                type="time"
+                value={currentSleepStart}
+                onChange={(e) => setCurrentSleepStart(e.target.value)}
+              />
+              <TextField
+                label="Sleep End"
+                type="time"
+                value={currentSleepEnd}
+                onChange={(e) => setCurrentSleepEnd(e.target.value)}
+              />
+              <TextField
+                label="Current Date"
+                type="date"
+                value={currentDate}
+                onChange={(e) => setCurrentDate(e.target.value)}
+              />
+              <TextField
+                label="Start Date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <TextField
+                label="End Date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+              <TextField
+                label="Daily Shift (min)"
+                type="number"
+                inputProps={{ step: 0.1, min: 0 }}
+                value={dailyShiftMinutes}
+                onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
+              />
+            </Box>
+            <Box sx={{ minWidth: 180 }}>
+              <ButtonGroup variant="outlined" size="large" sx={{ width: '100%' }}>
+                <Button onClick={shiftNotesUp} sx={{ flex: 1 }}>
+                  SHIFT NOTES ↑
+                </Button>
+                <Button onClick={shiftNotesDown} sx={{ flex: 1 }}>
+                  SHIFT NOTES ↓
+                </Button>
+              </ButtonGroup>
+            </Box>
           </Stack>
         </Container>
 
