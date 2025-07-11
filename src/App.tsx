@@ -315,13 +315,13 @@ export default function App() {
                       onClick={() => setSelectedRow(day)}
                       sx={selectedRow === day ? { backgroundColor: 'rgba(25, 118, 210, 0.15)' } : { cursor: 'pointer' }}
                     >
-                      <TableCell sx={{ backgroundColor: '#232323' }}>{day}</TableCell>
-                      <TableCell sx={{ backgroundColor: '#232323' }}>{format(date, "yyyy-MM-dd")}</TableCell>
-                      <TableCell sx={{ backgroundColor: '#232323' }}>{`${sleepStart} - ${sleepEnd}`}</TableCell>
-                      <TableCell sx={{ backgroundColor: '#232323' }}>{`${wakeStart} - ${wakeEnd}`}</TableCell>
-                      <TableCell sx={{ backgroundColor: '#232323' }}>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
-                      <TableCell sx={{ backgroundColor: '#232323' }}>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
-                      <TableCell sx={{ backgroundColor: '#232323' }}>
+                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{day}</TableCell>
+                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{format(date, "yyyy-MM-dd")}</TableCell>
+                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{`${sleepStart} - ${sleepEnd}`}</TableCell>
+                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{`${wakeStart} - ${wakeEnd}`}</TableCell>
+                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
+                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
+                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>
                         <TextField
                           size="small"
                           placeholder="Add note..."
