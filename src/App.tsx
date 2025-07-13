@@ -30,6 +30,7 @@ import {
 } from "./styles";
 import {
   generateSchedule,
+  getStepValue,
 } from "./utils";
 import ScheduleTable, { ScheduleTableRef } from "./components/ScheduleTable";
 
@@ -82,6 +83,7 @@ export default function App() {
     scheduleTableRef.current?.shiftNotesDown();
   };
 
+  const step = getStepValue(dailyShiftMinutes);
   return (
     <ThemeProvider theme={darkTheme}>
       <Box sx={mainContainerStyles}>
@@ -137,6 +139,11 @@ export default function App() {
                 type="number"
                 value={dailyShiftMinutes}
                 onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
+                slotProps={{
+                  input: {
+                    inputProps: { step }, 
+                  },
+                }}
                 sx={textFieldStyles}
               />
             </Box>

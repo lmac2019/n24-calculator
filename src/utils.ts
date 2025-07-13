@@ -170,3 +170,10 @@ export function shiftNotesDown(notes: Record<string, string>): Record<string, st
 
   return newNotes;
 }
+
+export function getStepValue(value: number): number {
+  const str = value.toString();
+  const decimal = str.split(".")[1];
+  if (!decimal) return 1;
+  return 1 / Math.pow(10, decimal.length);
+}
