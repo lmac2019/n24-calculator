@@ -16,8 +16,6 @@ import {
   ButtonGroup,
 } from "@mui/material";
 import { 
-  LOCAL_TZ, 
-  BEIJING_TZ, 
   DEFAULT_SLEEP_START,
   DEFAULT_SLEEP_END,
   DEFAULT_CURRENT_DATE,
@@ -42,74 +40,14 @@ import {
   getTableCellStyles,
   notesTextFieldStyles
 } from "./styles";
+import { format } from "date-fns";
 import {
-  addDays,
-  differenceInDays,
-  format,
-  parseISO,
-  addMinutes,
-  setHours,
-  setMinutes,
-} from "date-fns";
-import {
-  zonedTimeToUtc,
-  utcToZonedTime,
-  format as formatTz,
-} from "date-fns-tz";
-
-
-
-function timeStringToDate(baseDate: Date, timeStr: string): Date {
-  const [h, m] = timeStr.split(":").map(Number);
-  return setMinutes(setHours(baseDate, h), m);
-}
-
-function isNextDay(start: Date, end: Date, timeZone?: string) {
-  const getHour = (d: Date) => timeZone ? parseInt(formatTz(d, "H", { timeZone }), 10) : d.getHours();
-  const getMinute = (d: Date) => timeZone ? parseInt(formatTz(d, "m", { timeZone }), 10) : d.getMinutes();
-  const startHour = getHour(start);
-  const startMinute = getMinute(start);
-  const endHour = getHour(end);
-  const endMinute = getMinute(end);
-  return (endHour < startHour) || (endHour === startHour && endMinute <= startMinute);
-}
-
-function formatBeijingRange(
-  localStart: Date,
-  localEnd: Date
-): [string, string] {
-  const startUtc = zonedTimeToUtc(localStart, LOCAL_TZ);
-  const endUtc = zonedTimeToUtc(localEnd, LOCAL_TZ);
-  const startInBJ = utcToZonedTime(startUtc, BEIJING_TZ);
-  const endInBJ = utcToZonedTime(endUtc, BEIJING_TZ);
-
-  const startStr = formatTz(startInBJ, "h:mm a", { timeZone: BEIJING_TZ });
-  const endStr = formatTz(endInBJ, "h:mm a", { timeZone: BEIJING_TZ });
-
-  const nextDay = isNextDay(startInBJ, endInBJ, BEIJING_TZ);
-
-  return [startStr, `${endStr}${nextDay ? " (next day)" : ""}`];
-}
-
-function formatLocalRange(start: Date, end: Date): [string, string] {
-  const startStr = format(start, "h:mm a");
-  const endStr = format(end, "h:mm a");
-  const nextDay = isNextDay(start, end);
-  return [startStr, `${endStr}${nextDay ? " (next day)" : ""}`];
-}
-
-type ScheduleRow = {
-  day: number;
-  date: Date;
-  sleepStart: string;
-  sleepEnd: string;
-  wakeStart: string;
-  wakeEnd: string;
-  sleepStartBJ: string;
-  sleepEndBJ: string;
-  wakeStartBJ: string;
-  wakeEndBJ: string;
-};
+  generateSchedule,
+  getNoteKey,
+  shiftNotesUp,
+  shiftNotesDown,
+  type ScheduleRow
+} from "./utils";
 
 export default function App() {
   const [currentSleepStart, setCurrentSleepStart] = useState(() => localStorage.getItem("currentSleepStart") || DEFAULT_SLEEP_START);
@@ -150,63 +88,14 @@ export default function App() {
     localStorage.setItem("scheduleNotes", JSON.stringify(notes));
   }, [notes]);
 
-  const generateSchedule = (): ScheduleRow[] => {
-    const start = parseISO(startDate);
-    const end = parseISO(endDate);
-    const current = parseISO(currentDate);
-
-    const totalDays = differenceInDays(end, start) + 1;
-    const offsetDays = differenceInDays(start, current);
-
-    const rows: ScheduleRow[] = [];
-
-    for (let i = 0; i < totalDays; i++) {
-      const dayNum = i + 1;
-      const thisDate = addDays(start, i);
-      const shift = (offsetDays + i) * dailyShiftMinutes;
-
-      const baseSleepStart = timeStringToDate(thisDate, currentSleepStart);
-      const baseSleepEnd = timeStringToDate(thisDate, currentSleepEnd);
-
-      const sleepStart = addMinutes(baseSleepStart, shift);
-      const sleepEnd = addMinutes(baseSleepEnd, shift);
-      const wakeStart = sleepEnd;
-      const wakeEnd = sleepStart;
-
-      const [sleepStartStr, sleepEndStr] = formatLocalRange(
-        sleepStart,
-        sleepEnd
-      );
-      const [wakeStartStr, wakeEndStr] = formatLocalRange(wakeStart, wakeEnd);
-
-      const [sleepStartBJ, sleepEndBJ] = formatBeijingRange(
-        sleepStart,
-        sleepEnd
-      );
-      const [wakeStartBJ, wakeEndBJ] = formatBeijingRange(wakeStart, wakeEnd);
-
-      rows.push({
-        day: dayNum,
-        date: thisDate,
-        sleepStart: sleepStartStr,
-        sleepEnd: sleepEndStr,
-        wakeStart: wakeStartStr,
-        wakeEnd: wakeEndStr,
-        sleepStartBJ,
-        sleepEndBJ,
-        wakeStartBJ,
-        wakeEndBJ,
-      });
-    }
-
-    return rows;
-  };
-
-  const schedule = generateSchedule();
-
-  const getNoteKey = (day: number, date: Date): string => {
-    return format(date, "yyyy-MM-dd");
-  };
+  const schedule = generateSchedule(
+    currentSleepStart,
+    currentSleepEnd,
+    currentDate,
+    startDate,
+    endDate,
+    dailyShiftMinutes
+  );
 
   const handleNoteChange = (day: number, date: Date, value: string) => {
     const key = getNoteKey(day, date);
@@ -216,46 +105,12 @@ export default function App() {
     }));
   };
 
-  const shiftNotesUp = () => {
-    setNotes(prev => {
-      const newNotes: Record<string, string> = {};
-      
-      // Get all the dates from the schedule
-      const scheduleDates = schedule.map(row => format(row.date, "yyyy-MM-dd"));
-      
-      // For each date in the schedule, move the note from the next day
-      for (let i = 0; i < scheduleDates.length - 1; i++) {
-        const currentDate = scheduleDates[i];
-        const nextDate = scheduleDates[i + 1];
-        
-        if (prev[nextDate]) {
-          newNotes[currentDate] = prev[nextDate];
-        }
-      }
-      
-      return newNotes;
-    });
+  const handleShiftNotesUp = () => {
+    setNotes(prev => shiftNotesUp(prev, schedule));
   };
 
-  const shiftNotesDown = () => {
-    setNotes(prev => {
-      const newNotes: Record<string, string> = {};
-      
-      // Get all the dates from the schedule
-      const scheduleDates = schedule.map(row => format(row.date, "yyyy-MM-dd"));
-      
-      // For each date in the schedule, move the note from the previous day
-      for (let i = 1; i < scheduleDates.length; i++) {
-        const currentDate = scheduleDates[i];
-        const prevDate = scheduleDates[i - 1];
-        
-        if (prev[prevDate]) {
-          newNotes[currentDate] = prev[prevDate];
-        }
-      }
-      
-      return newNotes;
-    });
+  const handleShiftNotesDown = () => {
+    setNotes(prev => shiftNotesDown(prev, schedule));
   };
 
   return (
@@ -319,10 +174,10 @@ export default function App() {
             </Box>
             <Box sx={buttonGroupContainerStyles}>
               <ButtonGroup variant="outlined" size="large" sx={buttonGroupStyles}>
-                <Button onClick={shiftNotesUp} sx={buttonStyles}>
+                <Button onClick={handleShiftNotesUp} sx={buttonStyles}>
                   SHIFT NOTES ↑
                 </Button>
-                <Button onClick={shiftNotesDown} sx={buttonStyles}>
+                <Button onClick={handleShiftNotesDown} sx={buttonStyles}>
                   SHIFT NOTES ↓
                 </Button>
               </ButtonGroup>
