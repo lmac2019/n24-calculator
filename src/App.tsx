@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Container,
   TextField,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
   Typography,
   Stack,
-  Paper,
   Box,
   ThemeProvider,
   Button,
@@ -32,37 +26,23 @@ import {
   textFieldStyles,
   buttonGroupContainerStyles,
   buttonGroupStyles,
-  buttonStyles,
-  tableContainerStyles,
-  tableStyles,
-  tableHeaderCellStyles,
-  getTableRowStyles,
-  getTableCellStyles,
-  notesTextFieldStyles
+  buttonStyles
 } from "./styles";
-import { format } from "date-fns";
 import {
   generateSchedule,
-  getNoteKey,
-  shiftNotesUp,
-  shiftNotesDown,
-  type ScheduleRow
 } from "./utils";
+import ScheduleTable, { ScheduleTableRef } from "./components/ScheduleTable";
 
 export default function App() {
+  const scheduleTableRef = useRef<ScheduleTableRef>(null);
   const [currentSleepStart, setCurrentSleepStart] = useState(() => localStorage.getItem("currentSleepStart") || DEFAULT_SLEEP_START);
   const [currentSleepEnd, setCurrentSleepEnd] = useState(() => localStorage.getItem("currentSleepEnd") || DEFAULT_SLEEP_END);
   const [currentDate, setCurrentDate] = useState(() => localStorage.getItem("currentDate") || DEFAULT_CURRENT_DATE);
   const [startDate, setStartDate] = useState(() => localStorage.getItem("startDate") || DEFAULT_START_DATE);
   const [endDate, setEndDate] = useState(() => localStorage.getItem("endDate") || DEFAULT_END_DATE);
-  const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [dailyShiftMinutes, setDailyShiftMinutes] = useState(() => {
     const stored = localStorage.getItem("dailyShiftMinutes");
     return stored ? parseFloat(stored) : DEFAULT_DAILY_SHIFT_MINUTES;
-  });
-  const [notes, setNotes] = useState<Record<string, string>>(() => {
-    const stored = localStorage.getItem("scheduleNotes");
-    return stored ? JSON.parse(stored) : {};
   });
 
   // Save input values to localStorage when they change
@@ -84,9 +64,6 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("dailyShiftMinutes", String(dailyShiftMinutes));
   }, [dailyShiftMinutes]);
-  useEffect(() => {
-    localStorage.setItem("scheduleNotes", JSON.stringify(notes));
-  }, [notes]);
 
   const schedule = generateSchedule(
     currentSleepStart,
@@ -97,26 +74,18 @@ export default function App() {
     dailyShiftMinutes
   );
 
-  const handleNoteChange = (day: number, date: Date, value: string) => {
-    const key = getNoteKey(day, date);
-    setNotes(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
   const handleShiftNotesUp = () => {
-    setNotes(prev => shiftNotesUp(prev, schedule));
+    scheduleTableRef.current?.shiftNotesUp();
   };
 
   const handleShiftNotesDown = () => {
-    setNotes(prev => shiftNotesDown(prev, schedule));
+    scheduleTableRef.current?.shiftNotesDown();
   };
 
   return (
     <ThemeProvider theme={darkTheme}>
       <Box sx={mainContainerStyles}>
-              <Container maxWidth="lg" sx={headerContainerStyles}>
+        <Container maxWidth="lg" sx={headerContainerStyles}>
           <Typography variant="h5" gutterBottom>
             Sleep Cycle Schedule (Vancouver ➜ Beijing)
           </Typography>
@@ -166,7 +135,6 @@ export default function App() {
               <TextField
                 label="Daily Shift (min)"
                 type="number"
-                inputProps={{ step: 0.1, min: 0 }}
                 value={dailyShiftMinutes}
                 onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
                 sx={textFieldStyles}
@@ -185,67 +153,10 @@ export default function App() {
           </Stack>
         </Container>
 
-        <Box component={Paper} sx={tableContainerStyles}>
-          <Table stickyHeader size="small" sx={tableStyles}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={tableHeaderCellStyles}>Day</TableCell>
-                <TableCell sx={tableHeaderCellStyles}>Date</TableCell>
-                <TableCell sx={tableHeaderCellStyles}>Sleep</TableCell>
-                <TableCell sx={tableHeaderCellStyles}>Wake</TableCell>
-                <TableCell sx={tableHeaderCellStyles}>Sleep (Beijing)</TableCell>
-                <TableCell sx={tableHeaderCellStyles}>Wake (Beijing)</TableCell>
-                <TableCell sx={tableHeaderCellStyles}>Notes</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {schedule.map(
-                ({
-                  day,
-                  date,
-                  sleepStart,
-                  sleepEnd,
-                  wakeStart,
-                  wakeEnd,
-                  sleepStartBJ,
-                  sleepEndBJ,
-                  wakeStartBJ,
-                  wakeEndBJ,
-                }) => {
-                  const noteKey = getNoteKey(day, date);
-                  const note = notes[noteKey] || "";
-                  
-                  return (
-                    <TableRow
-                      key={day}
-                      hover
-                      selected={selectedRow === day}
-                      onClick={() => setSelectedRow(selectedRow === day ? null : day)}
-                      sx={getTableRowStyles(selectedRow, day)}
-                    >
-                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{day}</TableCell>
-                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{format(date, "yyyy-MM-dd")} ({format(date, "EEE")})</TableCell>
-                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{`${sleepStart} - ${sleepEnd}`}</TableCell>
-                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{`${wakeStart} - ${wakeEnd}`}</TableCell>
-                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
-                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
-                      <TableCell sx={getTableCellStyles(selectedRow, day)}>
-                        <TextField
-                          size="small"
-                          placeholder="Add note..."
-                          value={note}
-                          onChange={(e) => handleNoteChange(day, date, e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
-                          sx={notesTextFieldStyles}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  );
-                }
-              )}
-            </TableBody>
-          </Table>
-        </Box>
+        <ScheduleTable 
+          ref={scheduleTableRef}
+          schedule={schedule} 
+        />
       </Box>
     </ThemeProvider>
   );
