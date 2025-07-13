@@ -12,10 +12,20 @@ import {
   Paper,
   Box,
   ThemeProvider,
-  createTheme,
   Button,
   ButtonGroup,
 } from "@mui/material";
+import { 
+  LOCAL_TZ, 
+  BEIJING_TZ, 
+  darkTheme,
+  DEFAULT_SLEEP_START,
+  DEFAULT_SLEEP_END,
+  DEFAULT_CURRENT_DATE,
+  DEFAULT_START_DATE,
+  DEFAULT_END_DATE,
+  DEFAULT_DAILY_SHIFT_MINUTES
+} from "./constants";
 import {
   addDays,
   differenceInDays,
@@ -31,23 +41,7 @@ import {
   format as formatTz,
 } from "date-fns-tz";
 
-const LOCAL_TZ = "America/Vancouver";
-const BEIJING_TZ = "Asia/Shanghai";
 
-// Create dark theme
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    background: {
-      default: '#121212',
-      paper: '#1e1e1e',
-    },
-    text: {
-      primary: '#ffffff',
-      secondary: '#b3b3b3',
-    },
-  },
-});
 
 function timeStringToDate(baseDate: Date, timeStr: string): Date {
   const [h, m] = timeStr.split(":").map(Number);
@@ -102,15 +96,15 @@ type ScheduleRow = {
 };
 
 export default function App() {
-  const [currentSleepStart, setCurrentSleepStart] = useState(() => localStorage.getItem("currentSleepStart") || "21:54");
-  const [currentSleepEnd, setCurrentSleepEnd] = useState(() => localStorage.getItem("currentSleepEnd") || "06:22");
-  const [currentDate, setCurrentDate] = useState(() => localStorage.getItem("currentDate") || "2025-07-07");
-  const [startDate, setStartDate] = useState(() => localStorage.getItem("startDate") || "2025-10-20");
-  const [endDate, setEndDate] = useState(() => localStorage.getItem("endDate") || "2025-11-14");
+  const [currentSleepStart, setCurrentSleepStart] = useState(() => localStorage.getItem("currentSleepStart") || DEFAULT_SLEEP_START);
+  const [currentSleepEnd, setCurrentSleepEnd] = useState(() => localStorage.getItem("currentSleepEnd") || DEFAULT_SLEEP_END);
+  const [currentDate, setCurrentDate] = useState(() => localStorage.getItem("currentDate") || DEFAULT_CURRENT_DATE);
+  const [startDate, setStartDate] = useState(() => localStorage.getItem("startDate") || DEFAULT_START_DATE);
+  const [endDate, setEndDate] = useState(() => localStorage.getItem("endDate") || DEFAULT_END_DATE);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [dailyShiftMinutes, setDailyShiftMinutes] = useState(() => {
     const stored = localStorage.getItem("dailyShiftMinutes");
-    return stored ? parseFloat(stored) : 51.43;
+    return stored ? parseFloat(stored) : DEFAULT_DAILY_SHIFT_MINUTES;
   });
   const [notes, setNotes] = useState<Record<string, string>>(() => {
     const stored = localStorage.getItem("scheduleNotes");
