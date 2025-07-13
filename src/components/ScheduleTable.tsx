@@ -55,11 +55,11 @@ const ScheduleTable = forwardRef<ScheduleTableRef, ScheduleTableProps>(({ schedu
   };
 
   const handleShiftNotesUp = () => {
-    setNotes(prev => shiftNotesUp(prev, schedule));
+    setNotes(prev => shiftNotesUp(prev));
   };
-
+  
   const handleShiftNotesDown = () => {
-    setNotes(prev => shiftNotesDown(prev, schedule));
+    setNotes(prev => shiftNotesDown(prev));
   };
 
   // Expose shift methods to parent component

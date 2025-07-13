@@ -147,52 +147,26 @@ export function generateSchedule(
   return rows;
 }
 
-/**
- * Shifts notes up by one day (moves each note to the previous day)
- */
-export function shiftNotesUp(
-  notes: Record<string, string>,
-  schedule: ScheduleRow[]
-): Record<string, string> {
+export function shiftNotesUp(notes: Record<string, string>): Record<string, string> {
   const newNotes: Record<string, string> = {};
-  
-  // Get all the dates from the schedule
-  const scheduleDates = schedule.map(row => format(row.date, "yyyy-MM-dd"));
-  
-  // For each date in the schedule, move the note from the next day
-  for (let i = 0; i < scheduleDates.length - 1; i++) {
-    const currentDate = scheduleDates[i];
-    const nextDate = scheduleDates[i + 1];
-    
-    if (notes[nextDate]) {
-      newNotes[currentDate] = notes[nextDate];
-    }
+
+  for (const key in notes) {
+    const shiftedDate = addDays(parseISO(key), -1);
+    const newKey = format(shiftedDate, "yyyy-MM-dd");
+    newNotes[newKey] = notes[key];
   }
-  
+
   return newNotes;
 }
 
-/**
- * Shifts notes down by one day (moves each note to the next day)
- */
-export function shiftNotesDown(
-  notes: Record<string, string>,
-  schedule: ScheduleRow[]
-): Record<string, string> {
+export function shiftNotesDown(notes: Record<string, string>): Record<string, string> {
   const newNotes: Record<string, string> = {};
-  
-  // Get all the dates from the schedule
-  const scheduleDates = schedule.map(row => format(row.date, "yyyy-MM-dd"));
-  
-  // For each date in the schedule, move the note from the previous day
-  for (let i = 1; i < scheduleDates.length; i++) {
-    const currentDate = scheduleDates[i];
-    const prevDate = scheduleDates[i - 1];
-    
-    if (notes[prevDate]) {
-      newNotes[currentDate] = notes[prevDate];
-    }
+
+  for (const key in notes) {
+    const shiftedDate = addDays(parseISO(key), 1);
+    const newKey = format(shiftedDate, "yyyy-MM-dd");
+    newNotes[newKey] = notes[key];
   }
-  
+
   return newNotes;
-} 
+}
