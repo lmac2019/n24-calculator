@@ -18,7 +18,6 @@ import {
 import { 
   LOCAL_TZ, 
   BEIJING_TZ, 
-  darkTheme,
   DEFAULT_SLEEP_START,
   DEFAULT_SLEEP_END,
   DEFAULT_CURRENT_DATE,
@@ -26,6 +25,23 @@ import {
   DEFAULT_END_DATE,
   DEFAULT_DAILY_SHIFT_MINUTES
 } from "./constants";
+import {
+  darkTheme,
+  mainContainerStyles,
+  headerContainerStyles,
+  formControlsStackStyles,
+  formInputsContainerStyles,
+  textFieldStyles,
+  buttonGroupContainerStyles,
+  buttonGroupStyles,
+  buttonStyles,
+  tableContainerStyles,
+  tableStyles,
+  tableHeaderCellStyles,
+  getTableRowStyles,
+  getTableCellStyles,
+  notesTextFieldStyles
+} from "./styles";
 import {
   addDays,
   differenceInDays,
@@ -244,18 +260,8 @@ export default function App() {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <Box
-        sx={{
-          height: "100vh",
-          width: "100vw",
-          display: "flex",
-          flexDirection: "column",
-          fontFamily: "monospace",
-          backgroundColor: 'background.paper',
-          color: 'text.primary',
-        }}
-      >
-              <Container maxWidth="lg" sx={{ mt: 4, flexShrink: 0 }}>
+      <Box sx={mainContainerStyles}>
+              <Container maxWidth="lg" sx={headerContainerStyles}>
           <Typography variant="h5" gutterBottom>
             Sleep Cycle Schedule (Vancouver ➜ Beijing)
           </Typography>
@@ -264,43 +270,43 @@ export default function App() {
             spacing={2}
             justifyContent="space-between"
             alignItems="center"
-            sx={{ mb: 3 }}
+            sx={formControlsStackStyles}
           >
-            <Box sx={{ display: 'flex', gap: 2, flex: 1 }}>
+            <Box sx={formInputsContainerStyles}>
               <TextField
                 label="Sleep Start"
                 type="time"
                 value={currentSleepStart}
                 onChange={(e) => setCurrentSleepStart(e.target.value)}
-                sx={{ minWidth: 150 }}
+                sx={textFieldStyles}
               />
               <TextField
                 label="Sleep End"
                 type="time"
                 value={currentSleepEnd}
                 onChange={(e) => setCurrentSleepEnd(e.target.value)}
-                sx={{ minWidth: 150 }}
+                sx={textFieldStyles}
               />
               <TextField
                 label="Current Date"
                 type="date"
                 value={currentDate}
                 onChange={(e) => setCurrentDate(e.target.value)}
-                sx={{ minWidth: 150 }}
+                sx={textFieldStyles}
               />
               <TextField
                 label="Start Date"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                sx={{ minWidth: 150 }}
+                sx={textFieldStyles}
               />
               <TextField
                 label="End Date"
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                sx={{ minWidth: 150 }}
+                sx={textFieldStyles}
               />
               <TextField
                 label="Daily Shift (min)"
@@ -308,15 +314,15 @@ export default function App() {
                 inputProps={{ step: 0.1, min: 0 }}
                 value={dailyShiftMinutes}
                 onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
-                sx={{ minWidth: 150 }}
+                sx={textFieldStyles}
               />
             </Box>
-            <Box sx={{ minWidth: 350 }}>
-              <ButtonGroup variant="outlined" size="large" sx={{ width: '100%' }}>
-                <Button onClick={shiftNotesUp} sx={{ flex: 1 }}>
+            <Box sx={buttonGroupContainerStyles}>
+              <ButtonGroup variant="outlined" size="large" sx={buttonGroupStyles}>
+                <Button onClick={shiftNotesUp} sx={buttonStyles}>
                   SHIFT NOTES ↑
                 </Button>
-                <Button onClick={shiftNotesDown} sx={{ flex: 1 }}>
+                <Button onClick={shiftNotesDown} sx={buttonStyles}>
                   SHIFT NOTES ↓
                 </Button>
               </ButtonGroup>
@@ -324,27 +330,17 @@ export default function App() {
           </Stack>
         </Container>
 
-        <Box
-          component={Paper}
-          sx={{
-            flexGrow: 1,
-            maxWidth: "100vw",
-            overflow: "auto",
-            px: 2,
-            pb: 2,
-            backgroundColor: 'background.paper',
-          }}
-        >
-          <Table stickyHeader size="small" sx={{ minWidth: 1200 }}>
+        <Box component={Paper} sx={tableContainerStyles}>
+          <Table stickyHeader size="small" sx={tableStyles}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ backgroundColor: '#232323' }}>Day</TableCell>
-                <TableCell sx={{ backgroundColor: '#232323' }}>Date</TableCell>
-                <TableCell sx={{ backgroundColor: '#232323' }}>Sleep</TableCell>
-                <TableCell sx={{ backgroundColor: '#232323' }}>Wake</TableCell>
-                <TableCell sx={{ backgroundColor: '#232323' }}>Sleep (Beijing)</TableCell>
-                <TableCell sx={{ backgroundColor: '#232323' }}>Wake (Beijing)</TableCell>
-                <TableCell sx={{ backgroundColor: '#232323' }}>Notes</TableCell>
+                <TableCell sx={tableHeaderCellStyles}>Day</TableCell>
+                <TableCell sx={tableHeaderCellStyles}>Date</TableCell>
+                <TableCell sx={tableHeaderCellStyles}>Sleep</TableCell>
+                <TableCell sx={tableHeaderCellStyles}>Wake</TableCell>
+                <TableCell sx={tableHeaderCellStyles}>Sleep (Beijing)</TableCell>
+                <TableCell sx={tableHeaderCellStyles}>Wake (Beijing)</TableCell>
+                <TableCell sx={tableHeaderCellStyles}>Notes</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -370,22 +366,22 @@ export default function App() {
                       hover
                       selected={selectedRow === day}
                       onClick={() => setSelectedRow(selectedRow === day ? null : day)}
-                      sx={selectedRow === day ? { backgroundColor: 'rgba(25, 118, 210, 0.15)' } : { cursor: 'pointer' }}
+                      sx={getTableRowStyles(selectedRow, day)}
                     >
-                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{day}</TableCell>
-                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{format(date, "yyyy-MM-dd")} ({format(date, "EEE")})</TableCell>
-                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{`${sleepStart} - ${sleepEnd}`}</TableCell>
-                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{`${wakeStart} - ${wakeEnd}`}</TableCell>
-                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
-                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
-                      <TableCell sx={{ backgroundColor: selectedRow === day ? 'rgba(25, 118, 210, 0.15)' : '#232323' }}>
+                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{day}</TableCell>
+                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{format(date, "yyyy-MM-dd")} ({format(date, "EEE")})</TableCell>
+                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{`${sleepStart} - ${sleepEnd}`}</TableCell>
+                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{`${wakeStart} - ${wakeEnd}`}</TableCell>
+                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{`${sleepStartBJ} - ${sleepEndBJ}`}</TableCell>
+                      <TableCell sx={getTableCellStyles(selectedRow, day)}>{`${wakeStartBJ} - ${wakeEndBJ}`}</TableCell>
+                      <TableCell sx={getTableCellStyles(selectedRow, day)}>
                         <TextField
                           size="small"
                           placeholder="Add note..."
                           value={note}
                           onChange={(e) => handleNoteChange(day, date, e.target.value)}
                           onClick={(e) => e.stopPropagation()}
-                          sx={{ minWidth: 200 }}
+                          sx={notesTextFieldStyles}
                         />
                       </TableCell>
                     </TableRow>
