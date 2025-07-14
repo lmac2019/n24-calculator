@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   Container,
   TextField,
@@ -9,13 +9,13 @@ import {
   Button,
   ButtonGroup,
 } from "@mui/material";
-import { 
+import {
   DEFAULT_SLEEP_START,
   DEFAULT_SLEEP_END,
   DEFAULT_CURRENT_DATE,
   DEFAULT_START_DATE,
   DEFAULT_END_DATE,
-  DEFAULT_DAILY_SHIFT_MINUTES
+  DEFAULT_DAILY_SHIFT_MINUTES,
 } from "./constants";
 import {
   darkTheme,
@@ -26,12 +26,9 @@ import {
   textFieldStyles,
   buttonGroupContainerStyles,
   buttonGroupStyles,
-  buttonStyles
+  buttonStyles,
 } from "./styles";
-import {
-  generateSchedule,
-  getStepValue,
-} from "./utils";
+import { generateSchedule, getStepValue } from "./utils";
 import ScheduleTable, { ScheduleTableRef } from "./components/ScheduleTable";
 import { usePersistentState } from "./hooks/usePersistantState";
 
@@ -42,27 +39,27 @@ export default function App() {
     key: "currentSleepStart",
     defaultValue: DEFAULT_SLEEP_START,
   });
-  
+
   const [currentSleepEnd, setCurrentSleepEnd] = usePersistentState({
     key: "currentSleepEnd",
     defaultValue: DEFAULT_SLEEP_END,
   });
-  
+
   const [currentDate, setCurrentDate] = usePersistentState({
     key: "currentDate",
     defaultValue: DEFAULT_CURRENT_DATE,
   });
-  
+
   const [startDate, setStartDate] = usePersistentState({
     key: "startDate",
     defaultValue: DEFAULT_START_DATE,
   });
-  
+
   const [endDate, setEndDate] = usePersistentState({
     key: "endDate",
     defaultValue: DEFAULT_END_DATE,
   });
-  
+
   const [dailyShiftMinutes, setDailyShiftMinutes] = usePersistentState({
     key: "dailyShiftMinutes",
     defaultValue: DEFAULT_DAILY_SHIFT_MINUTES,
@@ -145,14 +142,18 @@ export default function App() {
                 onChange={(e) => setDailyShiftMinutes(Number(e.target.value))}
                 slotProps={{
                   input: {
-                    inputProps: { step }, 
+                    inputProps: { step },
                   },
                 }}
                 sx={textFieldStyles}
               />
             </Box>
             <Box sx={buttonGroupContainerStyles}>
-              <ButtonGroup variant="outlined" size="large" sx={buttonGroupStyles}>
+              <ButtonGroup
+                variant="outlined"
+                size="large"
+                sx={buttonGroupStyles}
+              >
                 <Button onClick={handleShiftNotesUp} sx={buttonStyles}>
                   SHIFT NOTES ↑
                 </Button>
@@ -164,10 +165,7 @@ export default function App() {
           </Stack>
         </Container>
 
-        <ScheduleTable 
-          ref={scheduleTableRef}
-          schedule={schedule} 
-        />
+        <ScheduleTable ref={scheduleTableRef} schedule={schedule} />
       </Box>
     </ThemeProvider>
   );
