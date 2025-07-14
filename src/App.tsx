@@ -33,38 +33,42 @@ import {
   getStepValue,
 } from "./utils";
 import ScheduleTable, { ScheduleTableRef } from "./components/ScheduleTable";
+import { usePersistentState } from "./hooks/usePersistantState";
 
 export default function App() {
   const scheduleTableRef = useRef<ScheduleTableRef>(null);
-  const [currentSleepStart, setCurrentSleepStart] = useState(() => localStorage.getItem("currentSleepStart") || DEFAULT_SLEEP_START);
-  const [currentSleepEnd, setCurrentSleepEnd] = useState(() => localStorage.getItem("currentSleepEnd") || DEFAULT_SLEEP_END);
-  const [currentDate, setCurrentDate] = useState(() => localStorage.getItem("currentDate") || DEFAULT_CURRENT_DATE);
-  const [startDate, setStartDate] = useState(() => localStorage.getItem("startDate") || DEFAULT_START_DATE);
-  const [endDate, setEndDate] = useState(() => localStorage.getItem("endDate") || DEFAULT_END_DATE);
-  const [dailyShiftMinutes, setDailyShiftMinutes] = useState(() => {
-    const stored = localStorage.getItem("dailyShiftMinutes");
-    return stored ? parseFloat(stored) : DEFAULT_DAILY_SHIFT_MINUTES;
-  });
 
-  // Save input values to localStorage when they change
-  useEffect(() => {
-    localStorage.setItem("currentSleepStart", currentSleepStart);
-  }, [currentSleepStart]);
-  useEffect(() => {
-    localStorage.setItem("currentSleepEnd", currentSleepEnd);
-  }, [currentSleepEnd]);
-  useEffect(() => {
-    localStorage.setItem("currentDate", currentDate);
-  }, [currentDate]);
-  useEffect(() => {
-    localStorage.setItem("startDate", startDate);
-  }, [startDate]);
-  useEffect(() => {
-    localStorage.setItem("endDate", endDate);
-  }, [endDate]);
-  useEffect(() => {
-    localStorage.setItem("dailyShiftMinutes", String(dailyShiftMinutes));
-  }, [dailyShiftMinutes]);
+  const [currentSleepStart, setCurrentSleepStart] = usePersistentState({
+    key: "currentSleepStart",
+    defaultValue: DEFAULT_SLEEP_START,
+  });
+  
+  const [currentSleepEnd, setCurrentSleepEnd] = usePersistentState({
+    key: "currentSleepEnd",
+    defaultValue: DEFAULT_SLEEP_END,
+  });
+  
+  const [currentDate, setCurrentDate] = usePersistentState({
+    key: "currentDate",
+    defaultValue: DEFAULT_CURRENT_DATE,
+  });
+  
+  const [startDate, setStartDate] = usePersistentState({
+    key: "startDate",
+    defaultValue: DEFAULT_START_DATE,
+  });
+  
+  const [endDate, setEndDate] = usePersistentState({
+    key: "endDate",
+    defaultValue: DEFAULT_END_DATE,
+  });
+  
+  const [dailyShiftMinutes, setDailyShiftMinutes] = usePersistentState({
+    key: "dailyShiftMinutes",
+    defaultValue: DEFAULT_DAILY_SHIFT_MINUTES,
+    parser: parseFloat,
+    serializer: String,
+  });
 
   const schedule = generateSchedule(
     currentSleepStart,
