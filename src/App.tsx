@@ -158,28 +158,11 @@ export default function App() {
   const LOCAL_STORAGE_KEY = "calendarEventsShared";
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
 
-  // Load events from localStorage on mount
+  // Whenever schedule inputs change, update calendar events in localStorage and state
   useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved).map((ev: any) => ({
-        ...ev,
-        StartTime: new Date(ev.StartTime),
-        EndTime: new Date(ev.EndTime),
-      }));
-      setCalendarEvents(parsed);
-    } else {
-      setCalendarEvents(scheduleToCalendarEvents(schedule));
-    }
-    // eslint-disable-next-line
-  }, []);
-
-  // When schedule changes, update calendarEvents if not user-edited
-  useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!saved) {
-      setCalendarEvents(scheduleToCalendarEvents(schedule));
-    }
+    const newEvents = scheduleToCalendarEvents(schedule);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newEvents));
+    setCalendarEvents(newEvents);
     // eslint-disable-next-line
   }, [
     currentSleepStart,
