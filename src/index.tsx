@@ -1,11 +1,29 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { registerLicense } from "@syncfusion/ej2-base";
+
+// Register Syncfusion license key from Vite environment variable
+const licenseKey = import.meta.env.VITE_SYNCFUSION_LICENSE_KEY;
+if (licenseKey) {
+  console.log("Syncfusion license key registered");
+  registerLicense(licenseKey);
+}
+
+// Vite env type declaration for TypeScript
+declare global {
+  interface ImportMeta {
+    env: {
+      VITE_SYNCFUSION_LICENSE_KEY?: string;
+      [key: string]: any;
+    };
+  }
+}
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>

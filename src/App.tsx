@@ -10,6 +10,7 @@ import {
   ButtonGroup,
   Dialog,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
   DEFAULT_SLEEP_START,
   DEFAULT_SLEEP_END,
@@ -239,50 +240,59 @@ export default function App() {
           <Typography variant="h5" gutterBottom>
             Sleep Cycle Schedule (Vancouver ➜ Beijing)
           </Typography>
-          <Stack
-            direction="row"
-            spacing={2}
-            justifyContent="space-between"
-            alignItems="center"
-            sx={formControlsStackStyles}
-            flexWrap="wrap"
-          >
-            <Box sx={formInputsContainerStyles}>
+          {/* Inputs Row */}
+          <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
               <TextField
                 label="Sleep Start"
                 type="time"
                 value={currentSleepStart}
                 onChange={(e) => setCurrentSleepStart(e.target.value)}
                 sx={textFieldStyles}
+                fullWidth
               />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
               <TextField
                 label="Sleep End"
                 type="time"
                 value={currentSleepEnd}
                 onChange={(e) => setCurrentSleepEnd(e.target.value)}
                 sx={textFieldStyles}
+                fullWidth
               />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
               <TextField
                 label="Current Date"
                 type="date"
                 value={currentDate}
                 onChange={(e) => setCurrentDate(e.target.value)}
                 sx={textFieldStyles}
+                fullWidth
               />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
               <TextField
                 label="Start Date"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 sx={textFieldStyles}
+                fullWidth
               />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
               <TextField
                 label="End Date"
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 sx={textFieldStyles}
+                fullWidth
               />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
               <TextField
                 label="Daily Shift (min)"
                 type="number"
@@ -294,13 +304,32 @@ export default function App() {
                   },
                 }}
                 sx={textFieldStyles}
+                fullWidth
               />
-            </Box>
-            <Box sx={buttonGroupContainerStyles}>
+            </Grid>
+          </Grid>
+          {/* View Toggles and Contextual Actions Row */}
+          <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+            <ButtonGroup variant="contained" sx={{ mr: 2 }}>
+              <Button
+                color={view === "table" ? "primary" : "inherit"}
+                onClick={() => setView("table")}
+              >
+                Table View
+              </Button>
+              <Button
+                color={view === "calendar" ? "primary" : "inherit"}
+                onClick={() => setView("calendar")}
+              >
+                Calendar View
+              </Button>
+            </ButtonGroup>
+            <Box sx={{ flex: 1 }} />
+            {view === "table" ? (
               <ButtonGroup
                 variant="outlined"
                 size="large"
-                sx={buttonGroupStyles}
+                sx={{ minWidth: 300 }}
               >
                 <Button onClick={handleShiftNotesUp} sx={buttonStyles}>
                   SHIFT NOTES ↑
@@ -309,44 +338,25 @@ export default function App() {
                   SHIFT NOTES ↓
                 </Button>
               </ButtonGroup>
-            </Box>
-            <Stack direction="row" spacing={1} sx={{ ml: 2, flexWrap: "wrap" }}>
-              <ButtonGroup variant="contained">
+            ) : (
+              <ButtonGroup variant="outlined">
                 <Button
-                  color={view === "table" ? "primary" : "inherit"}
-                  onClick={() => setView("table")}
+                  color={
+                    calendarViewType === "vancouver" ? "primary" : "inherit"
+                  }
+                  onClick={() => setCalendarViewType("vancouver")}
                 >
-                  Table View
+                  Vancouver Calendar
                 </Button>
                 <Button
-                  color={view === "calendar" ? "primary" : "inherit"}
-                  onClick={() => setView("calendar")}
+                  color={calendarViewType === "beijing" ? "primary" : "inherit"}
+                  onClick={() => setCalendarViewType("beijing")}
                 >
-                  Calendar View
+                  Beijing Calendar
                 </Button>
               </ButtonGroup>
-              {view === "calendar" && (
-                <ButtonGroup variant="outlined">
-                  <Button
-                    color={
-                      calendarViewType === "vancouver" ? "primary" : "inherit"
-                    }
-                    onClick={() => setCalendarViewType("vancouver")}
-                  >
-                    Vancouver Calendar
-                  </Button>
-                  <Button
-                    color={
-                      calendarViewType === "beijing" ? "primary" : "inherit"
-                    }
-                    onClick={() => setCalendarViewType("beijing")}
-                  >
-                    Beijing Calendar
-                  </Button>
-                </ButtonGroup>
-              )}
-            </Stack>
-          </Stack>
+            )}
+          </Box>
         </Container>
         {view === "table" ? (
           <ScheduleTable ref={scheduleTableRef} schedule={schedule} />
