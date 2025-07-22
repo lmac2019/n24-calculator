@@ -6,12 +6,12 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^7.2.0",
+    "@syncfusion/ej2-react-schedule": "^30.1.39",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "date-fns": "^2.30.0",
@@ -19,17 +19,16 @@
     "gh-pages": "^6.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"No test runner configured.\" && exit 0",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "eslintConfig": {
     "extends": [
@@ -49,5 +48,10 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://lmac2019.github.io/n24-calculator"
+  "homepage": "https://lmac2019.github.io/n24-calculator",
+  "devDependencies": {
+    "@types/node": "^24.0.15",
+    "@vitejs/plugin-react": "^4.7.0",
+    "vite": "^7.0.5"
+  }
 }
